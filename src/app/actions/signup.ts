@@ -17,7 +17,6 @@ export async function signup(state: FormState, formData: FormData) {
         }
     }
 
-
     try {
         const response = await mockApiCall()
 

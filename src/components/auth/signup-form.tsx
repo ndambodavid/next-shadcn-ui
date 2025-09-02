@@ -13,6 +13,7 @@ import { email } from "zod"
 import { useActionState, useState } from "react"
 import { signup } from "@/app/actions/signup"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import Image from "next/image"
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 
@@ -38,24 +39,19 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
     return (
 
         <div
-            className={cn("min-h-screen flex items-center justify-center p-4 ", className)}
+            className={cn(" flex items-center justify-center p-4 ", className)}
             {...props}
-            style={{
-                backgroundImage: "url('/images/gradient-background.jpg')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-            }}
         >
-            <div
+            {/* <div
                 className="absolute inset-0 opacity-0"
                 style={{
                     background: "rgba(0, 0, 0, 0.15)",
                 }}
-            ></div>
+            >
+            </div> */}
 
             {/* Floating glass orbs for visual interest */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {/* <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div
                     className="absolute top-1/4 left-1/4 w-32 h-32 rounded-full opacity-50 animate-pulse"
                     style={{
@@ -83,10 +79,10 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
                         boxShadow: "0 8px 32px rgba(255, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4)",
                     }}
                 ></div>
-            </div>
+            </div> */}
 
             <Card
-                className="max-w-md hover-lift shadow-2xl relative z-10 opacity-100 w-full mx-[0] border-transparent"
+                className="w-full mx-auto hover-lift relative z-10  border-transparent"
                 style={{
                     background: "transparent",
                     backdropFilter: "blur(40px) saturate(250%)",

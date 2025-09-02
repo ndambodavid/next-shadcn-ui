@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import {
   IconCamera,
   IconChartBar,
@@ -58,7 +59,7 @@ const data = {
     },
     {
       title: "Projects",
-      url: "#",
+      url: "/admin/projects",
       icon: IconFolder,
     },
     {
@@ -162,8 +163,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <Link href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                {/* <IconInnerShadowTop className="!size-5" /> */}
+                {/* <span className="text-base font-semibold">Acme Inc.</span> */}
+                <Image
+                  src="/dhanalogo.png"
+                  width={150}
+                  height={40}
+                  alt="Logo"
+                ></Image>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

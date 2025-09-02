@@ -7,7 +7,7 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { SectionCards } from "@/components/dashboard/section-cards";
 import { SiteHeader } from "@/components/dashboard/side-header";
 
-import data from "./data.json"
+import data from "@/data/data.json";
 
 export default function Home() {
   return (
