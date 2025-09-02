@@ -200,7 +200,7 @@ export default function LoginPage() {
                     </div>
                     <div className="text-center">
                         <p className="text-sm text-card-foreground/70 font-sans">
-                            Don't have an account?{" "}
+                            Don&apos;t have an account?{" "}
                             <a href="#" className="text-card-foreground font-medium hover:underline">
                                 Sign Up
                             </a>

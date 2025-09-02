@@ -280,7 +280,7 @@ export default function ProjectDetailsPage({ className, ...props }: ProjectDetai
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center space-y-4">
                     <h1 className="text-2xl font-bold text-gray-900">Project Not Found</h1>
-                    <p className="text-gray-600">The project you're looking for doesn't exist.</p>
+                    <p className="text-gray-600">The project you&apos;re looking for doesn&apos;t exist.</p>
                     <Button onClick={() => router.push("/")} variant="outline">
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         Back to Projects
