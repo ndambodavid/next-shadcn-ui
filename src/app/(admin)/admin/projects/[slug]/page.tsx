@@ -11,8 +11,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, Edit3, Users, Target, MessageSquare, Plus, X, CheckCircle2, Clock, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Project } from "@/types/project"
+import { Milestone, Project, TeamMember, Comment } from "@/types/project"
 import React from "react"
+import { email } from "zod"
 
 // Mock project data - in real app this would come from API
 const mockProjectData: Project = {
@@ -40,7 +41,7 @@ const mockProjectData: Project = {
 • Integrate with existing inventory management systems`,
     milestones: [
         {
-            id: 1,
+            id: "1",
             title: "Discovery & Research Phase",
             description: "User research, competitor analysis, and technical requirements gathering",
             status: "completed",
@@ -48,7 +49,7 @@ const mockProjectData: Project = {
             progress: 100,
         },
         {
-            id: 2,
+            id: "2",
             title: "Design System & Wireframes",
             description: "Create design system, wireframes, and high-fidelity mockups",
             status: "completed",
@@ -56,7 +57,7 @@ const mockProjectData: Project = {
             progress: 100,
         },
         {
-            id: 3,
+            id: "3",
             title: "Frontend Development",
             description: "Implement responsive frontend with React and TypeScript",
             status: "in-progress",
@@ -64,7 +65,7 @@ const mockProjectData: Project = {
             progress: 75,
         },
         {
-            id: 4,
+            id: "4",
             title: "Backend Integration",
             description: "API development and database optimization",
             status: "in-progress",
@@ -72,7 +73,7 @@ const mockProjectData: Project = {
             progress: 45,
         },
         {
-            id: 5,
+            id: "5",
             title: "Testing & QA",
             description: "Comprehensive testing, bug fixes, and performance optimization",
             status: "pending",
@@ -80,7 +81,7 @@ const mockProjectData: Project = {
             progress: 0,
         },
         {
-            id: 6,
+            id: "6",
             title: "Deployment & Launch",
             description: "Production deployment and go-live activities",
             status: "pending",
@@ -90,7 +91,7 @@ const mockProjectData: Project = {
     ],
     team: [
         {
-            id: 1,
+            id: "1",
             name: "Sarah Chen",
             role: "Project Manager",
             avatar: "/professional-woman-diverse.png",
@@ -98,7 +99,7 @@ const mockProjectData: Project = {
             allocation: "100%",
         },
         {
-            id: 2,
+            id: "2",
             name: "Marcus Rodriguez",
             role: "Lead Developer",
             avatar: "/professional-man-developer.png",
@@ -106,7 +107,7 @@ const mockProjectData: Project = {
             allocation: "100%",
         },
         {
-            id: 3,
+            id: "3",
             name: "Emily Watson",
             role: "UX Designer",
             avatar: "/professional-woman-designer.png",
@@ -114,7 +115,7 @@ const mockProjectData: Project = {
             allocation: "80%",
         },
         {
-            id: 4,
+            id: "4",
             name: "David Kim",
             role: "Backend Developer",
             avatar: "/professional-man-backend.png",
@@ -124,7 +125,7 @@ const mockProjectData: Project = {
     ],
     comments: [
         {
-            id: 1,
+            id: "1",
             author: "Sarah Chen",
             avatar: "/professional-woman-diverse.png",
             content:
@@ -133,7 +134,7 @@ const mockProjectData: Project = {
             type: "update",
         },
         {
-            id: 2,
+            id: "2",
             author: "Marcus Rodriguez",
             avatar: "/professional-man-developer.png",
             content:
@@ -142,7 +143,7 @@ const mockProjectData: Project = {
             type: "milestone",
         },
         {
-            id: 3,
+            id: "3",
             author: "Emily Watson",
             avatar: "/professional-woman-designer.png",
             content:
@@ -155,12 +156,12 @@ const mockProjectData: Project = {
 }
 
 const availableTeamMembers = [
-    { id: 5, name: "Alex Thompson", role: "Frontend Developer", avatar: "/professional-developer.png" },
-    { id: 6, name: "Lisa Park", role: "QA Engineer", avatar: "/professional-woman-qa.png" },
-    { id: 7, name: "James Wilson", role: "DevOps Engineer", avatar: "/professional-man-devops.png" },
+    { id: "5", name: "Alex Thompson", role: "Frontend Developer", avatar: "/professional-developer.png", email: "alex@email.com" },
+    { id: "6", name: "Lisa Park", role: "QA Engineer", avatar: "/professional-woman-qa.png", email: "lisa@gmail.com" },
+    { id: "7", name: "James Wilson", role: "DevOps Engineer", avatar: "/professional-man-devops.png", email: "james@outlook.com"},
 ]
 
-interface ProjectDetailsProps extends React.HTMLAttributes<HTMLDivElement> { }
+type ProjectDetailsProps = React.HTMLAttributes<HTMLDivElement>;
 
 export default function ProjectDetailsPage({ className, ...props }: ProjectDetailsProps) {
     const params = useParams()
@@ -188,17 +189,17 @@ export default function ProjectDetailsPage({ className, ...props }: ProjectDetai
         fetchProject()
     }, [params.slug])
 
-    const handleAddTeamMember = (member: any) => {
-        setProject((prev: any) => ({
+    const handleAddTeamMember = (member: TeamMember) => {
+        setProject((prev) => ({
             ...prev,
             team: [...prev.team, { ...member, allocation: "50%" }],
         }))
     }
 
-    const handleRemoveTeamMember = (memberId: number) => {
-        setProject((prev: any) => ({
+    const handleRemoveTeamMember = (memberId: string) => {
+        setProject((prev) => ({
             ...prev,
-            team: prev.team.filter((member: any) => member.id !== memberId),
+            team: prev.team.filter((member: TeamMember) => member.id !== memberId),
         }))
     }
 
@@ -206,7 +207,7 @@ export default function ProjectDetailsPage({ className, ...props }: ProjectDetai
         if (!newComment.trim()) return
 
         const comment = {
-            id: Date.now(),
+            id: (project.comments.length + 1).toString(),
             author: "Current User",
             avatar: "/current-user.png",
             content: newComment,
@@ -214,7 +215,7 @@ export default function ProjectDetailsPage({ className, ...props }: ProjectDetai
             type: "comment",
         }
 
-        setProject((prev: any) => ({
+        setProject((prev) => ({
             ...prev,
             comments: [comment, ...prev.comments],
         }))
@@ -292,7 +293,7 @@ export default function ProjectDetailsPage({ className, ...props }: ProjectDetai
 
     return (
         <div className={cn("min-h-screen", className)}
-            {...params}
+            {...props}
         >
             {/* Header */}
             <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b">
@@ -403,7 +404,7 @@ export default function ProjectDetailsPage({ className, ...props }: ProjectDetai
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
-                                    {project.milestones.map((milestone: any) => (
+                                    {project.milestones.map((milestone: Milestone) => (
                                         <div key={milestone.id} className="border rounded-lg p-4 space-y-3">
                                             <div className="flex items-start justify-between">
                                                 <div className="flex items-start gap-3">
@@ -464,7 +465,7 @@ export default function ProjectDetailsPage({ className, ...props }: ProjectDetai
 
                                     {/* Comments List */}
                                     <div className="space-y-4">
-                                        {project.comments.map((comment: any) => (
+                                        {project.comments.map((comment: Comment) => (
                                             <div key={comment.id} className="flex gap-3">
                                                 <Avatar className="h-8 w-8">
                                                     <AvatarImage src={comment.avatar || "/placeholder.svg"} />
@@ -545,7 +546,7 @@ export default function ProjectDetailsPage({ className, ...props }: ProjectDetai
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-3">
-                                    {project.team.map((member: any) => (
+                                    {project.team.map((member: TeamMember) => (
                                         <div key={member.id} className="flex items-center justify-between p-2 rounded-lg border">
                                             <div className="flex items-center gap-3">
                                                 <Avatar className="h-8 w-8">

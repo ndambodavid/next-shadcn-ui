@@ -15,7 +15,7 @@ import { signup } from "@/app/actions/signup"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Image from "next/image"
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
+type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
@@ -295,7 +295,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
                     </div>
                     <div className="text-center">
                         <p className="text-sm text-card-foreground/70 font-sans">
-                            Don't have an account?{" "}
+                            Don&apos;t have an account?{" "}
                             <a href="#" className="text-card-foreground font-medium hover:underline">
                                 Sign Up
                             </a>
