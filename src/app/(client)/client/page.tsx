@@ -1,7 +1,7 @@
 import { SectionCards } from "@/components/dashboard/section-cards"
 import { ChartAreaInteractive } from "@/components/dashboard/chart-area-interactive"
 import { DataTable } from "@/components/dashboard/data-table"
-import data from "@/data/data.json"
+import data from "@/data/tasks.json"
 
 export default function DashboardPage() {
   return (
