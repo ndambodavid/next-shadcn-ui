@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   ArrowLeft,
   Search,
@@ -26,26 +25,27 @@ import Link from "next/link"
 import mockTasks from "@/data/tasks.json"
 import { DataTable } from "@/components/dashboard/data-table"
 import tasks from "@/data/tasks.json"
+import { Checkbox } from "@radix-ui/react-checkbox"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu"
+import { IconDotsVertical, IconGripVertical } from "@tabler/icons-react"
+import { ColumnDef } from "@tanstack/react-table"
+import z from "zod"
+import { useSortable } from "@dnd-kit/sortable"
+import { DragHandle } from "@/components/table/drag-handle"
+import { priorityConfig, statusConfig } from "@/components/table/table-config"
+import { TimeLogModal } from "@/components/timer/time-log-modal"
+import { DropdownMenuPortal } from "@/components/ui/dropdown-menu"
+import { time } from "console"
+import { Task } from "@/types/task"
 
-const statusConfig = {
-  Todo: { color: "bg-gray-100 text-gray-800", icon: Circle },
-  "In Progress": { color: "bg-blue-100 text-blue-800", icon: Clock },
-  "In Review": { color: "bg-yellow-100 text-yellow-800", icon: AlertCircle },
-  Completed: { color: "bg-green-100 text-green-800", icon: CheckCircle2 },
-  "On Hold": { color: "bg-red-100 text-red-800", icon: Pause },
-}
-
-const priorityConfig = {
-  Low: { color: "bg-gray-100 text-gray-600", flag: "text-gray-400" },
-  Medium: { color: "bg-yellow-100 text-yellow-700", flag: "text-yellow-500" },
-  High: { color: "bg-red-100 text-red-700", flag: "text-red-500" },
-}
 
 export default function TasksPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [priorityFilter, setPriorityFilter] = useState("all")
   const [projectFilter, setProjectFilter] = useState("all")
+  const [timeLogModalOpen, setTimeLogModalOpen] = useState(false)
+  const [selectedTaskForTimeLog, setSelectedTaskForTimeLog] = useState<Task>()
 
   // Calculate summary statistics
   const totalTasks = mockTasks.length
@@ -68,7 +68,183 @@ export default function TasksPage() {
     return matchesSearch && matchesStatus && matchesPriority && matchesProject
   })
 
+  const handleLogTime = (task: Task) => {
+    setSelectedTaskForTimeLog(task)
+    setTimeLogModalOpen(true)
+  }
+
   const projects = [...new Set(mockTasks.map((task) => task.project))]
+
+  const columns: ColumnDef<Task>[] = [
+    {
+      id: "drag",
+      header: () => null,
+      cell: ({ row }) => <DragHandle id={row.original.id} />,
+    },
+    {
+      id: "select",
+      header: ({ table }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "id",
+      header: "Task ID",
+      cell: ({ row }) => <div className="font-mono text-sm">{row.original.id}</div>
+    },
+    {
+      accessorKey: "title",
+      header: "Title & Description",
+      cell: ({ row }) => {
+        const task = row.original
+        return (
+          <div className="space-y-1">
+            <div className="font-medium">{task.title}</div>
+            <div className="text-sm text-muted-foreground line-clamp-2">{task.description}</div>
+            <div className="flex gap-1">
+              {task.tags?.map((tag) => (
+                <Badge key={tag} variant="secondary" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const task = row.original
+        const StatusIcon = statusConfig[task.status as keyof typeof statusConfig]?.icon || Circle
+        return (
+          <Badge
+            variant="secondary"
+            className={`${statusConfig[task.status as keyof typeof statusConfig]?.color} flex items-center gap-1 w-fit`}
+          >
+            <StatusIcon className="h-3 w-3" />
+            {task.status}
+          </Badge>
+        )
+      },
+    },
+    {
+      accessorKey: "priority",
+      header: "Priority",
+      cell: ({ row }) => {
+        const task = row.original
+        return (
+          <Badge
+            variant="secondary"
+            className={`${priorityConfig[task.priority as keyof typeof priorityConfig]?.color} flex items-center gap-1 w-fit`}
+          >
+            <Flag
+              className={`h-3 w-3 ${priorityConfig[task.priority as keyof typeof priorityConfig]?.flag}`}
+            />
+            {task.priority}
+          </Badge>
+        )
+      },
+    },
+    {
+      accessorKey: "assignee",
+      header: "Assignee",
+      cell: ({ row }) => {
+        const assignee = row.original.assignee
+        return (
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={assignee?.avatar || "/placeholder.svg"} alt={assignee?.name} />
+              <AvatarFallback className="text-xs">{assignee?.initials}</AvatarFallback>
+            </Avatar>
+            <div className="text-sm">{assignee?.name}</div>
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: "project",
+      header: "Project",
+      cell: ({ row }) => <div className="text-sm">{row.original.project}</div>
+    },
+    {
+      accessorKey: "dueDate",
+      header: "Due Date",
+      cell: ({ row }) => {
+        const task = row.original
+        const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "Completed"
+        return (
+          <div className={`text-sm flex items-center gap-1 ${isOverdue ? "text-red-600" : ""}`}>
+            <Calendar className="h-3 w-3" />
+            {new Date(task.dueDate).toLocaleDateString()}
+          </div>
+        )
+      }
+    },
+    {
+      accessorKey: "progress",
+      header: "Progress",
+      cell: ({ row }) => {
+        const task = row.original
+        return (
+          <div className="space-y-1">
+            <Progress value={task.progress} className="h-2" />
+            <div className="text-xs text-muted-foreground">{task.progress}%</div>
+          </div>
+        )
+      }
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                size="icon"
+              >
+                <IconDotsVertical />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuContent align="end"
+                className="z-50 w-40 p-3 rounded-lg border bg-white shadow-md dark:bg-neutral-900">
+                <DropdownMenuItem className="p-1.5 cursor-pointer hover:bg-muted focus:bg-muted">Edit</DropdownMenuItem>
+                <DropdownMenuItem className="p-1.5 cursor-pointer hover:bg-muted focus:bg-muted">Duplicate</DropdownMenuItem>
+                <DropdownMenuItem className="p-1.5 cursor-pointer hover:bg-muted focus:bg-muted" onClick={() => { handleLogTime(row.original) }}>Log Time</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="p-1.5 cursor-pointer text-red-600 hover:bg-red-50 focus:bg-red-50 dark:hover:bg-red-950">Delete</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenuPortal>
+          </DropdownMenu>
+        )
+      },
+    },
+  ]
 
   return (
     <div className="min-h-screen">
@@ -210,8 +386,21 @@ export default function TasksPage() {
         </Card>
 
         {/* Tasks Data Table */}
-        <DataTable data={tasks} />
+        <DataTable<Task> data={tasks} columns={columns} />
       </div>
+
+      {timeLogModalOpen && selectedTaskForTimeLog && (
+        <TimeLogModal
+        open={timeLogModalOpen}
+        onOpenChange={setTimeLogModalOpen}
+        task={selectedTaskForTimeLog}
+        // taskId={selectedTaskForTimeLog?.id}
+        // taskName={selectedTaskForTimeLog?.title}
+        // projectName={selectedTaskForTimeLog?.project}
+        // milestoneName={selectedTaskForTimeLog?.milestone}
+      />
+      )}
+      
     </div>
   )
 }

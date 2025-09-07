@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react"
+import React from "react"
 import {
   closestCenter,
   DndContext,
@@ -26,13 +26,8 @@ import {
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
-  IconCircleCheckFilled,
-  IconDotsVertical,
-  IconGripVertical,
   IconLayoutColumns,
-  IconLoader,
   IconPlus,
-  IconTrendingUp,
 } from "@tabler/icons-react"
 import {
   ColumnDef,
@@ -49,8 +44,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import { toast } from "sonner"
 import { z } from "zod"
 
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -58,9 +51,6 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -77,8 +67,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
@@ -90,7 +78,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
 import {
   Table,
   TableBody,
@@ -105,243 +92,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { title } from "process"
-import { create } from "domain"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import { AlertCircle, Calendar, CheckCircle2, Circle, Clock, Flag, Pause } from "lucide-react"
-import { Progress } from "../ui/progress"
-
-// export const schema = z.object({
-//   id: z.number(),
-//   header: z.string(),
-//   type: z.string(),
-//   status: z.string(),
-//   target: z.string(),
-//   limit: z.string(),
-//   reviewer: z.string(),
-// })
-
-const statusConfig = {
-  Todo: { color: "bg-gray-100 text-gray-800", icon: Circle },
-  "In Progress": { color: "bg-blue-100 text-blue-800", icon: Clock },
-  "In Review": { color: "bg-yellow-100 text-yellow-800", icon: AlertCircle },
-  Completed: { color: "bg-green-100 text-green-800", icon: CheckCircle2 },
-  "On Hold": { color: "bg-red-100 text-red-800", icon: Pause },
-}
-
-const priorityConfig = {
-  Low: { color: "bg-gray-100 text-gray-600", flag: "text-gray-400" },
-  Medium: { color: "bg-yellow-100 text-yellow-700", flag: "text-yellow-500" },
-  High: { color: "bg-red-100 text-red-700", flag: "text-red-500" },
-}
+import { taskSchema } from "@/types/task"
 
 
-export const schema = z.object({
-  id: z.string(),
-  title: z.string(),
-  description: z.string(),
-  status: z.string(),
-  priority: z.string(),
-  assignee: z.object({
-    name: z.string(),
-    avatar: z.string(),
-    initials: z.string(),
-  }),
-  project: z.string(),
-  dueDate: z.string(),
-  progress: z.number(),
-  tags: z.array(z.string()),
-  createdAt: z.string(),
-})
-
-// Create a separate component for the drag handle
-function DragHandle({ id }: { id: string }) {
-  const { attributes, listeners } = useSortable({
-    id,
-  })
-
-  return (
-    <Button
-      {...attributes}
-      {...listeners}
-      variant="ghost"
-      size="icon"
-      className="text-muted-foreground size-7 hover:bg-transparent"
-    >
-      <IconGripVertical className="text-muted-foreground size-3" />
-      <span className="sr-only">Drag to reorder</span>
-    </Button>
-  )
-}
-
-// ✅ New columns for the new schema
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-  },
-  {
-    id: "select",
-    header: ({ table }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "id",
-    header: "Task ID",
-    cell: ({ row }) => <div className="font-mono text-sm">{row.original.id}</div>
-  },
-  {
-    accessorKey: "title",
-    header: "Title & Description",
-    cell: ({ row }) => {
-      const task = row.original
-      return (
-        <div className="space-y-1">
-          <div className="font-medium">{task.title}</div>
-          <div className="text-sm text-muted-foreground line-clamp-2">{task.description}</div>
-          <div className="flex gap-1">
-            {task.tags?.map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )
-    },
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const task = row.original
-      const StatusIcon = statusConfig[task.status as keyof typeof statusConfig]?.icon || Circle
-      return (
-        <Badge
-          variant="secondary"
-          className={`${statusConfig[task.status as keyof typeof statusConfig]?.color} flex items-center gap-1 w-fit`}
-        >
-          <StatusIcon className="h-3 w-3" />
-          {task.status}
-        </Badge>
-      )
-    },
-  },
-  {
-    accessorKey: "priority",
-    header: "Priority",
-    cell: ({ row }) => {
-      const task = row.original
-      return (
-        <Badge
-          variant="secondary"
-          className={`${priorityConfig[task.priority as keyof typeof priorityConfig]?.color} flex items-center gap-1 w-fit`}
-        >
-          <Flag
-            className={`h-3 w-3 ${priorityConfig[task.priority as keyof typeof priorityConfig]?.flag}`}
-          />
-          {task.priority}
-        </Badge>
-      )
-    },
-  },
-  {
-    accessorKey: "assignee",
-    header: "Assignee",
-    cell: ({ row }) => {
-      const assignee = row.original.assignee
-      return (
-        <div className="flex items-center gap-2">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={assignee?.avatar || "/placeholder.svg"} alt={assignee?.name} />
-            <AvatarFallback className="text-xs">{assignee?.initials}</AvatarFallback>
-          </Avatar>
-          <div className="text-sm">{assignee?.name}</div>
-        </div>
-      )
-    },
-  },
-  {
-    accessorKey: "project",
-    header: "Project",
-    cell: ({ row }) => <div className="text-sm">{row.original.project}</div>
-  },
-  {
-    accessorKey: "dueDate",
-    header: "Due Date",
-    cell: ({ row }) => {
-      const task = row.original
-      const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "Completed"
-      return (
-        <div className={`text-sm flex items-center gap-1 ${isOverdue ? "text-red-600" : ""}`}>
-          <Calendar className="h-3 w-3" />
-          {new Date(task.dueDate).toLocaleDateString()}
-        </div>
-      )
-    }
-  },
-  {
-    accessorKey: "progress",
-    header: "Progress",
-    cell: ({ row }) => {
-      const task = row.original
-      return (
-        <div className="space-y-1">
-          <Progress value={task.progress} className="h-2" />
-          <div className="text-xs text-muted-foreground">{task.progress}%</div>
-        </div>
-      )
-    }
-  },
-  {
-    id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Duplicate</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-]
-
-
-function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
+function DraggableRow<T extends { id: UniqueIdentifier }>({ row }: { row: Row<T> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   })
@@ -366,12 +120,14 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
   )
 }
 
-export function DataTable({
+export function DataTable<T extends { id: UniqueIdentifier }>({
   data: initialData,
+  columns = []
 }: {
-  data: z.infer<typeof schema>[]
+  data: T[],
+  columns: ColumnDef<T, unknown>[]
 }) {
-  const [data, setData] = React.useState(() => initialData)
+  const [data, setData] = React.useState<T[]>(initialData)
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -389,6 +145,10 @@ export function DataTable({
     useSensor(TouchSensor, {}),
     useSensor(KeyboardSensor, {})
   )
+
+  React.useEffect(() => {
+    setData(initialData)
+  }, [initialData])
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(
     () => data?.map(({ id }) => id) || [],
@@ -437,24 +197,6 @@ export function DataTable({
       className="w-full flex-col justify-start gap-6"
     >
       <div className="flex items-center justify-between px-4 lg:px-6">
-        <Label htmlFor="view-selector" className="sr-only">
-          View
-        </Label>
-        <Select defaultValue="outline">
-          <SelectTrigger
-            className="flex w-fit @4xl/main:hidden"
-            size="sm"
-            id="view-selector"
-          >
-            <SelectValue placeholder="Select a view" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="outline">Outline</SelectItem>
-            <SelectItem value="past-performance">Past Performance</SelectItem>
-            <SelectItem value="key-personnel">Key Personnel</SelectItem>
-            <SelectItem value="focus-documents">Focus Documents</SelectItem>
-          </SelectContent>
-        </Select>
         <TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
           <TabsTrigger value="outline">Outline</TabsTrigger>
           <TabsTrigger value="past-performance">
@@ -677,7 +419,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
+function TableCellViewer({ item }: { item: z.infer<typeof taskSchema> }) {
   const isMobile = useIsMobile()
 
   return (
