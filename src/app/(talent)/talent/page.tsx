@@ -1,6 +1,6 @@
 import { SectionCards } from "@/components/dashboard/section-cards"
 import { ChartAreaInteractive } from "@/components/dashboard/chart-area-interactive"
-import { DataTable, schema } from "@/components/dashboard/data-table"
+import { DataTable} from "@/components/dashboard/data-table"
 import data from "@/data/tasks.json"
 import { DragHandle } from "@/components/table/drag-handle"
 import { Button } from "@/components/ui/button"
@@ -27,7 +27,7 @@ export default function DashboardPage() {
       setTimeLogModalOpen(true)
     }
 
-  const columns: ColumnDef<z.infer<typeof schema>>[] = [
+  const columns: ColumnDef<Task>[] = [
       {
         id: "drag",
         header: () => null,

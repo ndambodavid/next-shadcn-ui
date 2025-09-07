@@ -29,7 +29,8 @@ import { ColumnDef } from "@tanstack/react-table"
 import { DataTable } from "@/components/dashboard/data-table"
 import { timeLogs } from "@/types/time-log"
 
-const calculateSummaryStats = (logs: TimeLog[], filters: any) => {
+
+const calculateSummaryStats = (logs: TimeLog[], filters: Record<string, string>) => {
   const filteredLogs = logs.filter((log) => {
     const matchesSearch =
       log.task.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||

@@ -1,6 +1,6 @@
 import { SectionCards } from "@/components/dashboard/section-cards"
 import { ChartAreaInteractive } from "@/components/dashboard/chart-area-interactive"
-import { DataTable, schema } from "@/components/dashboard/data-table"
+import { DataTable } from "@/components/dashboard/data-table"
 import data from "@/data/tasks.json"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar"
@@ -27,7 +27,7 @@ export default function DashboardPage() {
     setTimeLogModalOpen(true)
   }
 
-  const columns: ColumnDef<z.infer<typeof schema>>[] = [
+  const columns: ColumnDef<Task>[] = [
     {
       id: "drag",
       header: () => null,
