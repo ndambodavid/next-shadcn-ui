@@ -27,12 +27,11 @@ import {
   IconReport,
   IconDatabase,
   IconFileWord,
-  IconFileAi,
-  IconFileDescription,
-  IconCamera,
   IconSettings,
   IconHelp,
   IconSearch,
+  IconTimeline,
+  IconActivity,
 } from "@tabler/icons-react"
 import Link from "next/link"
 
@@ -42,7 +41,9 @@ const workspaceNavMain = {
     { title: "Dashboard", url: "/admin/dashboard", icon: IconDashboard },
     { title: "Projects", url: "/admin/projects", icon: IconFolder },
     { title: "Tasks", url: "/admin/tasks", icon: IconListDetails },
+    { title: "Time Logs", url: "/admin/time-logs", icon: IconTimeline},
     { title: "Team", url: "/admin/team", icon: IconUsers },
+    { title: "Activity", url: "/admin/activity", icon: IconActivity}
   ],
   client: [
     { title: "Dashboard", url: "/client/dashboard", icon: IconDashboard },

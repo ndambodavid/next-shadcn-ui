@@ -31,10 +31,23 @@ const workspaceConfigs: Record<"admin" | "client" | "talent", WorkspaceConfig> =
     "/tasks": {
       title: "Tasks",
       description: "View, assign, and track tasks across projects",
+      action: (
+        <Button
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={() => window.location.assign("/admin/tasks/create")}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Create Task
+        </Button>
+      ),
     },
-    "/milestones": {
-      title: "Milestones",
-      description: "Track milestones and project progress",
+    "/time-logs": {
+      title: "Time Logs",
+      description: "Track time entries and manage timesheets",
+    },
+    "/activity": {
+      title: "System Activity",
+      description: "Track system activity and user actions",
     },
   },
   client: {
@@ -79,7 +92,7 @@ export function SiteHeader() {
     }
 
   return (
-    <header className="sticky top-0 z-10 bg-background border-b border-border">
+    <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <div>

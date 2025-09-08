@@ -321,33 +321,6 @@ export default function TimeLogsPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="flex h-16 items-center justify-between px-6">
-          <div className="flex items-center gap-4">
-            <Link href="/tasks">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Tasks
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-2xl font-semibold">Time Logs</h1>
-              <p className="text-sm text-muted-foreground">Track and manage team time entries</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={handleExport}>
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Log Time
-            </Button>
-          </div>
-        </div>
-      </div>
 
       <div className="p-6 space-y-6">
         {/* Enhanced Summary Cards */}
