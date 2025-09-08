@@ -142,7 +142,7 @@ export default function ProjectsPage() {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background border-b border-border">
+      {/* <header className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -157,7 +157,7 @@ export default function ProjectsPage() {
             </Button>
           </div>
         </div>
-      </header>
+      </header> */}
 
       {/* Filters */}
       <div className="sticky top-[120px] z-10 bg-background border-b border-border">

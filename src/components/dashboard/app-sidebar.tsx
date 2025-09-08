@@ -1,26 +1,8 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
+import { usePathname } from "next/navigation"
 import Image from "next/image"
-import {
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
-  IconUsers,
-} from "@tabler/icons-react"
-
 import {
   Sidebar,
   SidebarContent,
@@ -30,129 +12,74 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+
 import { NavDocuments } from "./nav-documents"
 import { NavMain } from "./nav-main"
 import { NavSecondary } from "./nav-secondary"
 import { NavUser } from "./nav-user"
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "#",
-      icon: IconDashboard,
-    },
-    {
-      title: "Lifecycle",
-      url: "#",
-      icon: IconListDetails,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: IconChartBar,
-    },
-    {
-      title: "Projects",
-      url: "/admin/projects",
-      icon: IconFolder,
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: IconUsers,
-    },
+import {
+  IconDashboard,
+  IconFolder,
+  IconUsers,
+  IconListDetails,
+  IconChartBar,
+  IconReport,
+  IconDatabase,
+  IconFileWord,
+  IconFileAi,
+  IconFileDescription,
+  IconCamera,
+  IconSettings,
+  IconHelp,
+  IconSearch,
+} from "@tabler/icons-react"
+import Link from "next/link"
+
+// --- Workspace-specific main navigation ---
+const workspaceNavMain = {
+  admin: [
+    { title: "Dashboard", url: "/admin/dashboard", icon: IconDashboard },
+    { title: "Projects", url: "/admin/projects", icon: IconFolder },
+    { title: "Tasks", url: "/admin/tasks", icon: IconListDetails },
+    { title: "Team", url: "/admin/team", icon: IconUsers },
   ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
+  client: [
+    { title: "Dashboard", url: "/client/dashboard", icon: IconDashboard },
+    { title: "Reports", url: "/client/reports", icon: IconReport },
+    { title: "Analytics", url: "/client/analytics", icon: IconChartBar },
   ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
-    },
+  talent: [
+    { title: "Dashboard", url: "/talent/dashboard", icon: IconDashboard },
+    { title: "My Projects", url: "/talent/projects", icon: IconFolder },
+    { title: "Profile", url: "/talent/profile", icon: IconUsers },
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+const commonData = {
+  user: {
+    name: "ndambodavid",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  },
+  navSecondary: [
+    { title: "Settings", url: "#", icon: IconSettings },
+    { title: "Get Help", url: "#", icon: IconHelp },
+    { title: "Search", url: "#", icon: IconSearch },
+  ],
+  documents: [
+    { name: "Data Library", url: "#", icon: IconDatabase },
+    { name: "Reports", url: "#", icon: IconReport },
+    { name: "Word Assistant", url: "#", icon: IconFileWord },
+  ],
+}
+
+export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname()
+  const [, workspace] = pathname.split("/") // "admin" | "client" | "talent"
+
+  const navMain = workspaceNavMain[workspace as keyof typeof workspaceNavMain] || []
+
   return (
     <Sidebar collapsible="none" className="h-auto border-r" {...props}>
       <SidebarHeader className="border-b">
@@ -162,27 +89,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <Link href="#">
-                {/* <IconInnerShadowTop className="!size-5" /> */}
-                {/* <span className="text-base font-semibold">Acme Inc.</span> */}
+              <Link href="/">
                 <Image
                   src="/dhanalogo.png"
                   width={150}
                   height={40}
                   alt="Logo"
-                ></Image>
+                />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* Dynamic per-workspace main navigation */}
+        <NavMain items={navMain} />
+
+        {/* Shared sections */}
+        <NavDocuments items={commonData.documents} />
+        <NavSecondary items={commonData.navSecondary} className="mt-auto" />
       </SidebarContent>
+
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={commonData.user} />
       </SidebarFooter>
     </Sidebar>
   )

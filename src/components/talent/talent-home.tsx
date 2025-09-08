@@ -177,7 +177,7 @@ export default function TalentHomePage() {
   }
 
   return (
-    <div className="container mx-auto px-6 py-8">
+    <div className="container mx-auto py-8">
       {/* Welcome Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">Good morning, {talentData.name}</h1>
@@ -196,7 +196,7 @@ export default function TalentHomePage() {
                 <p className="text-sm font-medium text-muted-foreground">Today&apos;s Tasks</p>
                 <p className="text-2xl font-bold text-foreground">{talentData.tasksToday}</p>
               </div>
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center">
                 <Target className="w-6 h-6 text-primary" />
               </div>
             </div>
@@ -211,7 +211,7 @@ export default function TalentHomePage() {
                 <p className="text-2xl font-bold text-foreground">{talentData.hoursLogged}h</p>
                 <p className="text-xs text-muted-foreground">of {talentData.targetHours}h target</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center">
                 <Timer className="w-6 h-6 text-blue-600" />
               </div>
             </div>
@@ -226,7 +226,7 @@ export default function TalentHomePage() {
                 <p className="text-2xl font-bold text-foreground">{talentData.completedTasks}</p>
                 <p className="text-xs text-green-600">This month</p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center">
                 <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
             </div>
@@ -240,7 +240,7 @@ export default function TalentHomePage() {
                 <p className="text-sm font-medium text-muted-foreground">Active Projects</p>
                 <p className="text-2xl font-bold text-foreground">{talentData.activeProjects}</p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-purple-600" />
               </div>
             </div>
@@ -252,12 +252,12 @@ export default function TalentHomePage() {
         {/* Today&apos;s Tasks & Time Tracker */}
         <div className="lg:col-span-2 space-y-6">
           {/* Time Tracker */}
-          <Card className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
+          <Card className="">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold mb-1">Current Task</h3>
-                  <p className="text-primary-foreground/80">{currentTask}</p>
+                  <p className="text-muted-foreground">{currentTask}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <Clock className="w-4 h-4" />
                     <span className="text-sm">2h 30m elapsed</span>
@@ -265,7 +265,7 @@ export default function TalentHomePage() {
                 </div>
                 <Button
                   onClick={() => setIsTimerRunning(!isTimerRunning)}
-                  className="bg-white/20 hover:bg-white/30 text-primary-foreground border-white/30"
+                  className=" hover:bg-white/30 text-primary-foreground border-white/30"
                 >
                   {isTimerRunning ? (
                     <>
@@ -297,9 +297,9 @@ export default function TalentHomePage() {
                   key={task.id}
                   className={`border rounded-lg p-4 transition-colors ${
                     task.status === "completed"
-                      ? "border-green-200 bg-green-50"
+                      ? "border-green-200"
                       : task.priority === "high"
-                        ? "border-red-200 bg-red-50"
+                        ? "border-red-200"
                         : "border-border hover:bg-muted/50"
                   }`}
                 >
@@ -316,9 +316,9 @@ export default function TalentHomePage() {
                           variant="outline"
                           className={
                             task.priority === "high"
-                              ? "border-red-200 text-red-700 bg-red-50"
+                              ? "border-red-200 text-red-700"
                               : task.priority === "medium"
-                                ? "border-orange-200 text-orange-700 bg-orange-50"
+                                ? "border-orange-200 text-orange-700"
                                 : "border-border text-muted-foreground bg-muted/50"
                           }
                         >

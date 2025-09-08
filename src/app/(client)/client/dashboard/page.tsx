@@ -26,8 +26,6 @@ export default function DashboardPage() {
   const [selectedTaskForTimeLog, setSelectedTaskForTimeLog] = useState<Task>()
 
 
-
-  
   return (
     <>
       <SectionCards />
