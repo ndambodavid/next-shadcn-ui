@@ -42,19 +42,19 @@ const workspaceNavMain = {
     { title: "Dashboard", url: "/admin/dashboard", icon: IconDashboard },
     { title: "Projects", url: "/admin/projects", icon: IconFolder },
     { title: "Tasks", url: "/admin/tasks", icon: IconListDetails },
-    { title: "Time Logs", url: "/admin/time-logs", icon: IconTimeline},
+    { title: "Time Logs", url: "/admin/time-logs", icon: IconTimeline },
     { title: "Team", url: "/admin/team", icon: IconUsers },
     { title: "Payments", url: "/admin/payments", icon: IconWallet },
-    { title: "Activity", url: "/admin/activity", icon: IconActivity}
+    { title: "Activity", url: "/admin/activity", icon: IconActivity }
   ],
   client: [
     { title: "Dashboard", url: "/client/dashboard", icon: IconDashboard },
     { title: "Projects", url: "/client/projects", icon: IconFolder },
     { title: "Tasks", url: "/client/tasks", icon: IconListDetails },
-    { title: "Time Logs", url: "/client/time-logs", icon: IconTimeline},
+    { title: "Time Logs", url: "/client/time-logs", icon: IconTimeline },
     { title: "Team", url: "/client/team", icon: IconUsers },
     { title: "Payments", url: "/client/payments", icon: IconWallet },
-    { title: "Activity", url: "/client/activity", icon: IconActivity},
+    { title: "Activity", url: "/client/activity", icon: IconActivity },
     { title: "Reports", url: "/client/reports", icon: IconReport },
     { title: "Analytics", url: "/client/analytics", icon: IconChartBar },
   ],
@@ -62,10 +62,10 @@ const workspaceNavMain = {
     { title: "Dashboard", url: "/talent/dashboard", icon: IconDashboard },
     { title: "Projects", url: "/talent/projects", icon: IconFolder },
     { title: "Tasks", url: "/talent/tasks", icon: IconListDetails },
-    { title: "Time Logs", url: "/talent/time-logs", icon: IconTimeline},
+    { title: "Time Logs", url: "/talent/time-logs", icon: IconTimeline },
     { title: "Team", url: "/talent/team", icon: IconUsers },
     { title: "Payments", url: "/talent/payments", icon: IconWallet },
-    { title: "Activity", url: "/talent/activity", icon: IconActivity},
+    { title: "Activity", url: "/talent/activity", icon: IconActivity },
     { title: "Profile", url: "/talent/profile", icon: IconUsers },
   ],
 }
@@ -95,8 +95,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const navMain = workspaceNavMain[workspace as keyof typeof workspaceNavMain] || []
 
   return (
-    <Sidebar collapsible="none" className="h-auto border-r" {...props}>
-      <SidebarHeader className="border-b">
+    <Sidebar
+      collapsible="none"
+      className="h-screen border-r sticky top-0 flex flex-col"
+      {...props}
+    >
+      {/* Header (logo) */}
+      <SidebarHeader className="border-b sticky top-0 bg-background z-10">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -116,18 +121,20 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent>
+      {/* Content (sticky, fills available space) */}
+      <SidebarContent className="flex-1 flex flex-col overflow-hidden">
         {/* Dynamic per-workspace main navigation */}
-        <NavMain items={navMain} />
+        <div className="flex-1 overflow-y-auto">
+          <NavMain items={navMain} />
+          <NavDocuments items={commonData.documents} />
+        </div>
 
-        {/* Shared sections */}
-        <NavDocuments items={commonData.documents} />
-        <NavSecondary items={commonData.navSecondary} className="mt-auto" />
+        {/* Footer always sticks to bottom */}
+        <SidebarFooter className="border-tsticky bottom-0 bg-background z-10">
+          <NavUser user={commonData.user} />
+        </SidebarFooter>
       </SidebarContent>
-
-      <SidebarFooter>
-        <NavUser user={commonData.user} />
-      </SidebarFooter>
     </Sidebar>
   )
+
 }
