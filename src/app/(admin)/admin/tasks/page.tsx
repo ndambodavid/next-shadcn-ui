@@ -9,33 +9,26 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
-  ArrowLeft,
   Search,
   Filter,
-  Plus,
   Calendar,
   Clock,
   Flag,
   CheckCircle2,
   Circle,
   AlertCircle,
-  Pause,
 } from "lucide-react"
-import Link from "next/link"
 import mockTasks from "@/data/tasks.json"
 import { DataTable } from "@/components/dashboard/data-table"
 import tasks from "@/data/tasks.json"
 import { Checkbox } from "@radix-ui/react-checkbox"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu"
-import { IconDotsVertical, IconGripVertical } from "@tabler/icons-react"
+import { IconDotsVertical } from "@tabler/icons-react"
 import { ColumnDef } from "@tanstack/react-table"
-import z from "zod"
-import { useSortable } from "@dnd-kit/sortable"
 import { DragHandle } from "@/components/table/drag-handle"
 import { priorityConfig, statusConfig } from "@/components/table/table-config"
 import { TimeLogModal } from "@/components/timer/time-log-modal"
 import { DropdownMenuPortal } from "@/components/ui/dropdown-menu"
-import { time } from "console"
 import { Task } from "@/types/task"
 
 
@@ -364,7 +357,7 @@ export default function TasksPage() {
         </Card>
 
         {/* Tasks Data Table */}
-        <DataTable<Task> data={tasks} columns={columns} />
+        <DataTable<Task> data={filteredTasks} columns={columns} />
       </div>
 
       {timeLogModalOpen && selectedTaskForTimeLog && (

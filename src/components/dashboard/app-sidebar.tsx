@@ -32,6 +32,7 @@ import {
   IconSearch,
   IconTimeline,
   IconActivity,
+  IconWallet,
 } from "@tabler/icons-react"
 import Link from "next/link"
 
@@ -43,16 +44,28 @@ const workspaceNavMain = {
     { title: "Tasks", url: "/admin/tasks", icon: IconListDetails },
     { title: "Time Logs", url: "/admin/time-logs", icon: IconTimeline},
     { title: "Team", url: "/admin/team", icon: IconUsers },
+    { title: "Payments", url: "/admin/payments", icon: IconWallet },
     { title: "Activity", url: "/admin/activity", icon: IconActivity}
   ],
   client: [
     { title: "Dashboard", url: "/client/dashboard", icon: IconDashboard },
+    { title: "Projects", url: "/client/projects", icon: IconFolder },
+    { title: "Tasks", url: "/client/tasks", icon: IconListDetails },
+    { title: "Time Logs", url: "/client/time-logs", icon: IconTimeline},
+    { title: "Team", url: "/client/team", icon: IconUsers },
+    { title: "Payments", url: "/client/payments", icon: IconWallet },
+    { title: "Activity", url: "/client/activity", icon: IconActivity},
     { title: "Reports", url: "/client/reports", icon: IconReport },
     { title: "Analytics", url: "/client/analytics", icon: IconChartBar },
   ],
   talent: [
     { title: "Dashboard", url: "/talent/dashboard", icon: IconDashboard },
-    { title: "My Projects", url: "/talent/projects", icon: IconFolder },
+    { title: "Projects", url: "/talent/projects", icon: IconFolder },
+    { title: "Tasks", url: "/talent/tasks", icon: IconListDetails },
+    { title: "Time Logs", url: "/talent/time-logs", icon: IconTimeline},
+    { title: "Team", url: "/talent/team", icon: IconUsers },
+    { title: "Payments", url: "/talent/payments", icon: IconWallet },
+    { title: "Activity", url: "/talent/activity", icon: IconActivity},
     { title: "Profile", url: "/talent/profile", icon: IconUsers },
   ],
 }

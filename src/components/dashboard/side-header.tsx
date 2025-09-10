@@ -49,11 +49,49 @@ const workspaceConfigs: Record<"admin" | "client" | "talent", WorkspaceConfig> =
       title: "System Activity",
       description: "Track system activity and user actions",
     },
+    "/payments": {
+      title: "Payment Management",
+      description: "Track your payments and manage payment methods",
+    },
   },
   client: {
     "/dashboard": {
       title: "Client Dashboard",
       description: "Overview of your active projects and progress",
+    },
+    "/projects": {
+      title: "Projects",
+      description: "Manage and track your project portfolio",
+      action: (
+        <Button
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={() => window.location.assign("/admin/projects/create")}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          New Project
+        </Button>
+      ),
+    },
+    "/tasks": {
+      title: "Tasks",
+      description: "View, assign, and track tasks across projects",
+      action: (
+        <Button
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={() => window.location.assign("/admin/tasks/create")}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Create Task
+        </Button>
+      ),
+    },
+    "/time-logs": {
+      title: "Time Logs",
+      description: "Track time entries and manage timesheets",
+    },
+    "/payments": {
+      title: "Payment Management",
+      description: "Track your payments and manage payment methods",
     },
     "/reports": {
       title: "Reports",
@@ -64,6 +102,40 @@ const workspaceConfigs: Record<"admin" | "client" | "talent", WorkspaceConfig> =
     "/dashboard": {
       title: "Talent Dashboard",
       description: "Your assigned projects and tasks",
+    },
+    "/projects": {
+      title: "Projects",
+      description: "Manage and track your project portfolio",
+      action: (
+        <Button
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={() => window.location.assign("/admin/projects/create")}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          New Project
+        </Button>
+      ),
+    },
+    "/tasks": {
+      title: "Tasks",
+      description: "View, assign, and track tasks across projects",
+      action: (
+        <Button
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={() => window.location.assign("/admin/tasks/create")}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Create Task
+        </Button>
+      ),
+    },
+    "/time-logs": {
+      title: "Time Logs",
+      description: "Track time entries and manage timesheets",
+    },
+    "/payments": {
+      title: "Payment Management",
+      description: "Track your payments and manage payment methods",
     },
     "/profile": {
       title: "Profile",

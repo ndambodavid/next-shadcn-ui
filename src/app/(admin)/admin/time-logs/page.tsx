@@ -7,22 +7,17 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
-  ArrowLeft,
   Clock,
-  Plus,
   Search,
   Filter,
   Calendar,
   Timer,
-  Download,
   MoreHorizontal,
   Edit,
   Trash2,
 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import Link from "next/link"
 import { TimeLog } from "@/types/time-log"
 import { Checkbox } from "@radix-ui/react-checkbox"
 import { ColumnDef } from "@tanstack/react-table"

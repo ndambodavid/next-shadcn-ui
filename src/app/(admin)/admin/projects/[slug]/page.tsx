@@ -13,7 +13,6 @@ import { ArrowLeft, Edit3, Users, Target, MessageSquare, Plus, X, CheckCircle2, 
 import { cn } from "@/lib/utils"
 import { Milestone, Project, TeamMember, Comment } from "@/types/project"
 import React from "react"
-import { email } from "zod"
 
 // Mock project data - in real app this would come from API
 const mockProjectData: Project = {
