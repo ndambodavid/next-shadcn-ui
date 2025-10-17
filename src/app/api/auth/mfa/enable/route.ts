@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { getSessionFromRequest } from "@/lib/session"
+import { getSession } from "@/lib/session"
 import { UserStore } from "@/server/users"
 import { fromBase32, verifyTOTP } from "@/lib/otp"
 
 const schema = z.object({ secret: z.string().min(16), code: z.string().min(6).max(10) })
 
 export async function POST(req: NextRequest) {
-  const session = getSessionFromRequest(req)
+  const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   try {
     const { secret, code } = schema.parse(await req.json())
-    const user = UserStore.findByEmail(session.email)
+    const user = UserStore.findByEmail(session?.email)
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 })
     const ok = verifyTOTP(code, fromBase32(secret))
     if (!ok) return NextResponse.json({ error: "Invalid code" }, { status: 400 })

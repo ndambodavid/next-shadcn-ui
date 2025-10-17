@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getSessionFromRequest } from "@/lib/session"
+import { getSession } from "@/lib/session"
 import { generateTOTPSecret } from "@/lib/otp"
 
 export async function POST(req: NextRequest) {
-  const session = getSessionFromRequest(req)
+  const session = await getSession()
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const secret = generateTOTPSecret()
   const issuer = encodeURIComponent("UI-RND")
