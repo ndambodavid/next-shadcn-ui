@@ -8,28 +8,48 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
-import { Link } from "lucide-react"
-import { email } from "zod"
-import { useActionState, useState } from "react"
-import { signup } from "@/app/actions/signup"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import Image from "next/image"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
+    const router = useRouter()
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
+    const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [state, action, pending] = useActionState(signup, undefined)
+    const [confirmPassword, setConfirmPassword] = useState("")
+    const [role] = useState<"admin" | "client" | "talent">("client")
+    const [error, setError] = useState<string | null>(null)
+    const [message, setMessage] = useState<string | null>(null)
 
     async function onSubmit(event: React.SyntheticEvent) {
         event.preventDefault()
         setIsLoading(true)
-
-        setTimeout(() => {
+        setError(null)
+        setMessage(null)
+        try {
+            if (password !== confirmPassword) {
+                throw new Error("Passwords do not match")
+            }
+            const res = await fetch("/api/auth/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, name, password, role }),
+            })
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}))
+                throw new Error(data?.error || "Signup failed")
+            }
+            setMessage("Account created successfully! Please log in.")
+            setTimeout(() => router.push("/login"), 1200)
+        } catch (e: any) {
+            setError(e?.message || "Signup failed")
+        } finally {
             setIsLoading(false)
-        }, 3000)
+        }
     }
 
     const handleSocialLogin = (provider: string) => {
@@ -39,7 +59,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
     return (
 
         <div
-            className={cn(" flex items-center justify-center p-4 ", className)}
+            className={cn("min-h-screen flex items-center justify-center p-4", className)}
             {...props}
         >
             {/* <div
@@ -99,68 +119,55 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
                 </CardHeader>
 
                 <CardContent className="space-y-6">
-                    {/* ✅ Display backend message if present */}
-                    {state?.message && (
-                        <Alert
-                            variant={state.success ? "default" : "destructive"}
-                            className={`mb-4 ${state.success ? "border-green-500 text-green-700" : ""
-                                }`}
-                        >
-                            <AlertDescription>{state.message}</AlertDescription>
+                    {error && (
+                        <Alert variant="destructive" className="mb-4">
+                            <AlertDescription>{error}</AlertDescription>
                         </Alert>
                     )}
-                    <form
-                        action={action}
-                        // onSubmit={onSubmit} 
-                        className="space-y-4 bg-transparent">
+                    {message && (
+                        <Alert className="mb-4 border-green-500 text-green-700">
+                            <AlertDescription>{message}</AlertDescription>
+                        </Alert>
+                    )}
+                    <form onSubmit={onSubmit} className="space-y-4 bg-transparent">
+                        <div className="space-y-2">
+                            <Label htmlFor="name" className="text-sm font-medium text-card-foreground font-sans">
+                                Name
+                            </Label>
+                            <Input
+                                id="name"
+                                placeholder="Your name"
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                disabled={isLoading}
+                                required
+                                className={cn(
+                                    "border-white/40 bg-white/10 placeholder:text-card-foreground/50 text-card-foreground py-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white/15 transition-all duration-200"
+                                )}
+                            />
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="email" className="text-sm font-medium text-card-foreground font-sans">
                                 Email
                             </Label>
                             <Input
                                 id="email"
-                                name="email"
                                 placeholder="name@example.com"
                                 type="email"
-                                // value={email}
-                                // onChange={(e) => setEmail(e.target.value)}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 autoCapitalize="none"
                                 autoComplete="email"
                                 autoCorrect="off"
                                 disabled={isLoading}
-                                className={cn(
-                                    "bg-transparent placeholder:text-card-foreground/50 text-card-foreground py-3 transition-all duration-200",
-                                    state?.errors?.email && "border-red-500 focus:ring-red-500"
-                                )}
-                            />
-                            {state?.errors?.email && (
-                                <p className="text-red-500 text-sm">{state.errors.email}</p>
-                            )}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="phone" className="text-sm font-medium text-card-foreground font-sans">
-                                Phone
-                            </Label>
-                            <Input
-                                id="phone"
-                                name="phone"
-                                type="tel"
-                                placeholder="Enter your phone number"
-                                // value={password}
-                                // onChange={(e) => setPassword(e.target.value)}
-                                autoComplete="tel"
-                                disabled={isLoading}
                                 required
                                 className={cn(
-                                    "bg-transparent placeholder:text-card-foreground/50 text-card-foreground py-3 transition-all duration-200",
-                                    state?.errors?.phone && "border-red-500 focus:ring-red-500"
+                                    "border-white/40 bg-white/10 placeholder:text-card-foreground/50 text-card-foreground py-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white/15 transition-all duration-200"
                                 )}
                             />
-                            {state?.errors?.phone && (
-                                <p className="text-red-500 text-sm">{state.errors.phone}</p>
-                            )}
                         </div>
+
 
                         <div className="space-y-2">
                             <Label htmlFor="password" className="text-sm font-medium text-card-foreground font-sans">
@@ -168,26 +175,17 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
                             </Label>
                             <Input
                                 id="password"
-                                name="password"
                                 type="password"
                                 placeholder="Enter your password"
-                                // value={password}
-                                // onChange={(e) => setPassword(e.target.value)}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 autoComplete="new-password"
                                 disabled={isLoading}
                                 required
                                 className={cn(
-                                    "bg-white/10 placeholder:text-card-foreground/50 text-card-foreground py-3 transition-all duration-200",
-                                    state?.errors?.password && "border-red-500 focus:ring-red-500"
+                                    "border-white/40 bg-white/10 placeholder:text-card-foreground/50 text-card-foreground py-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white/15 transition-all duration-200"
                                 )}
                             />
-                            {state?.errors?.password && (
-                                <ul className="text-red-500 text-sm list-disc pl-5">
-                                    {state.errors.password.map((err) => (
-                                        <li key={err}>{err}</li>
-                                    ))}
-                                </ul>
-                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -196,31 +194,25 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
                             </Label>
                             <Input
                                 id="confirmPassword"
-                                name="confirmPassword"
                                 type="password"
                                 placeholder="Confirm your password"
-                                // value={password}
-                                // onChange={(e) => setPassword(e.target.value)}
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                                 autoComplete="new-password"
                                 disabled={isLoading}
                                 required
                                 className={cn(
-                                    "bg-white/10 placeholder:text-card-foreground/50 text-card-foreground py-3 transition-all duration-200",
-                                    state?.errors?.confirmPassword && "border-red-500 focus:ring-red-500"
+                                    "border-white/40 bg-white/10 placeholder:text-card-foreground/50 text-card-foreground py-3 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white/15 transition-all duration-200"
                                 )}
                             />
-                            {state?.errors?.confirmPassword && (
-                                <p className="text-red-500 text-sm">
-                                    {state.errors.confirmPassword}
-                                </p>
-                            )}
                         </div>
 
                         <div>
                             <Button
                                 type="submit"
                                 className="w-full ripple-effect hover-lift font-sans font-bold py-5 transition-all duration-300"
-                                disabled={isLoading || pending}>
+                                style={{ backgroundColor: "#0C115B", color: "white" }}
+                                disabled={isLoading}>
                                 {isLoading && (
                                     <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                                 )}
@@ -286,18 +278,10 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
                     </div>
 
                     <div className="text-center">
-                        <a
-                            href="#"
-                            className="text-sm text-card-foreground/70 hover:text-card-foreground font-sans transition-colors"
-                        >
-                            Forgot your password?
-                        </a>
-                    </div>
-                    <div className="text-center">
                         <p className="text-sm text-card-foreground/70 font-sans">
-                            Don&apos;t have an account?{" "}
-                            <a href="#" className="text-card-foreground font-medium hover:underline">
-                                Sign Up
+                            ALready have an account?{" "}
+                            <a href="/login" className="text-card-foreground font-medium hover:underline">
+                                Login
                             </a>
                         </p>
                     </div>

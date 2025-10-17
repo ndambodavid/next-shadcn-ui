@@ -74,7 +74,7 @@ const commonData = {
   user: {
     name: "ndambodavid",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "/profile.jpg",
   },
   navSecondary: [
     { title: "Settings", url: "#", icon: IconSettings },
@@ -131,7 +131,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
         {/* Footer always sticks to bottom */}
         <SidebarFooter className="border-tsticky bottom-0 bg-background z-10">
-          <NavUser user={commonData.user} />
+          <NavUser />
         </SidebarFooter>
       </SidebarContent>
     </Sidebar>

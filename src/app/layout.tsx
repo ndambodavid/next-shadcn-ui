@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider"
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { AuthProvider } from "@/contexts/AuthContext"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +37,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            {/* Auth context provider wraps the app to provide session state */}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
           </ThemeProvider>
           <Analytics />
           <SpeedInsights />

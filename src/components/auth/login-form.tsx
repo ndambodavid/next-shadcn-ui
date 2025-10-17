@@ -8,19 +8,95 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
 
 export default function LoginPage() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const router = useRouter()
+    const searchParams = useSearchParams()
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
-        // Simulate login process
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        setIsLoading(false)
-        console.log("[v0] Login attempted with:", { email, password })
+        setError(null)
+        try {
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            })
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}))
+                throw new Error(data?.error || "Login failed")
+            }
+            const data = await res.json()
+            const getSafeNext = (raw: string | null): string => {
+                if (!raw) return "/"
+                let v = raw
+                // Try to decode once if it looks percent-encoded (e.g., %2Fclient)
+                try {
+                    v = decodeURIComponent(v)
+                } catch {
+                    // ignore
+                }
+                // If absolute URL, only allow same-origin and strip origin
+                if (typeof window !== "undefined" && /^(https?:)\/\//i.test(v)) {
+                    try {
+                        const u = new URL(v, window.location.origin)
+                        if (u.origin === window.location.origin) {
+                            v = u.pathname + (u.search || "")
+                        } else {
+                            return "/"
+                        }
+                    } catch {
+                        return "/"
+                    }
+                }
+                return typeof v === "string" && v.startsWith("/") ? v : "/"
+            }
+
+            if (data.needMfa) {
+                // store email for MFA step and redirect
+                if (typeof window !== "undefined") {
+                    sessionStorage.setItem("pendingEmail", email)
+                }
+                const safeNext = getSafeNext(searchParams.get("next"))
+                const nextQuery = safeNext && safeNext !== "/" ? `?next=${encodeURIComponent(safeNext)}` : ""
+                router.push(`/mfa${nextQuery}`)
+                return
+            }
+            // Logged in, redirect to next path if provided, else dashboard based on role
+            {
+                const safeNext = getSafeNext(searchParams.get("next"))
+                const role: "admin" | "client" | "talent" | undefined = data?.user?.role
+                const normalizePortalRoot = (path: string): string => {
+                    const portals = ["admin", "client", "talent"] as const
+                    for (const p of portals) {
+                        if (path === `/${p}` || path === `/${p}/`) return `/${p}/dashboard`
+                    }
+                    return path
+                }
+                const dest = (() => {
+                    if (!safeNext || safeNext === "/") {
+                        return role ? `/${role}/dashboard` : "/"
+                    }
+                    return normalizePortalRoot(safeNext)
+                })()
+
+                // ✅ THE FIX: Use a full page reload for the redirect.
+                // This guarantees the browser sends the new session cookie on the next request.
+                if (typeof window !== "undefined") {
+                    window.location.assign(dest)
+                }
+            }
+        } catch (err: any) {
+            setError(err?.message || "Login failed")
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     const handleSocialLogin = (provider: string) => {
@@ -93,6 +169,11 @@ export default function LoginPage() {
                 </CardHeader>
 
                 <CardContent className="space-y-6">
+                    {error && (
+                        <div className="text-sm text-red-500 bg-red-500/10 border border-red-500/30 rounded px-3 py-2">
+                            {error}
+                        </div>
+                    )}
                     <form onSubmit={handleLogin} className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="email" className="text-sm font-medium text-card-foreground font-sans">
@@ -201,7 +282,7 @@ export default function LoginPage() {
                     <div className="text-center">
                         <p className="text-sm text-card-foreground/70 font-sans">
                             Don&apos;t have an account?{" "}
-                            <a href="#" className="text-card-foreground font-medium hover:underline">
+                            <a href="/signup" className="text-card-foreground font-medium hover:underline">
                                 Sign Up
                             </a>
                         </p>
